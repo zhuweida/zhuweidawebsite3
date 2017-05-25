@@ -1,0 +1,62 @@
+        firebaseRef.child("Post").on('child_added',function(data){
+      show_image(data.val().url,data.val().username);
+});
+
+
+ fileButton.addEventListener('change',function(e){
+     //get file
+     var file = e.target.files[0];
+     
+     //create a storage ref
+     var storageRef = firebase.storage().ref('photo/'+file.name);
+     
+     
+     //uploadfile
+     var task = storageRef.put(file);
+     
+     //update progress bar
+     task.on('state_changed',
+     
+     function progress(snapshot){
+         var percentage = (snapshot.bytesTransferred / snapshot.totalBytes)*100;
+         uploader.value= percentage;
+ },
+     
+     function error(err){},
+     
+     function complete(){
+    
+        var downloadURL = task.snapshot.downloadURL;
+       //show_image(downloadURL);
+        writeNewPost(downloadURL,"bbb");
+       
+        //document.write(downloadURL); 
+        //var image = '<img src='+downloadURL+  'style="width:500px;height:400px;">';
+       //var image= '<img src="decisiontree.png"  style="width:500px;height:400px;">';
+        //imageposition1+=image;
+         
+     }
+     );
+ });  
+ 
+ 
+ 
+ 
+ function writeNewPost(url,username) {
+// A post entry.
+var postData = {
+    url: url,
+    username: firebaseUsername.di
+    
+};
+
+ // Get a key for a new Post.
+var newPostKey = firebase.database().ref().child('Post').push().key;
+
+// Write the new post's data simultaneously in the posts list and the user's post list.
+var updates = {};
+updates['/Post/' + newPostKey] = postData;
+
+
+return firebase.database().ref().update(updates);
+}
